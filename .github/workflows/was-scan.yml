@@ -22,19 +22,30 @@ jobs:
 
       - name: Run Tenable WAS Scan
         run: |
+          TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+          REPORT_DIR="scanner_results_$TIMESTAMP"
+          mkdir -p $REPORT_DIR
+
           docker pull tenable/was-scanner:latest
           docker run \
-            -v $(pwd):/scanner \
+            -v $(pwd)/$REPORT_DIR:/scanner \
             -t \
             -e WAS_MODE=cicd \
             -e ACCESS_KEY=${ACCESS_KEY} \
             -e SECRET_KEY=${SECRET_KEY} \
             -e CONFIG_FILE=/scanner/tenable_was.conf \
             -e WAS_URL=http://petstore:8080 \
+            --link petstore \
             tenable/was-scanner:latest || true
 
           echo "=== Archivos generados ==="
-          ls -la $(pwd)
+          ls -la $REPORT_DIR
         env:
           ACCESS_KEY: ${{ secrets.ACCESS_KEY }}
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
+
+      - name: Upload Tenable WAS report as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: tenable-was-report
+          path: scanner_results_*/
