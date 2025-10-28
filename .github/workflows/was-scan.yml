@@ -28,13 +28,14 @@ jobs:
 
           docker pull tenable/was-scanner:latest
           docker run \
-            -v "$(pwd)/$REPORT_DIR:/scanner" \
+            -v "$(pwd):/scanner" \
             -t \
             -e WAS_MODE=cicd \
             -e ACCESS_KEY="${ACCESS_KEY}" \
             -e SECRET_KEY="${SECRET_KEY}" \
             -e CONFIG_FILE=/scanner/tenable_was.conf \
             -e WAS_URL=http://petstore:8080 \
+            -e REPORT_DIR=/scanner/$REPORT_DIR \
             --link petstore \
             tenable/was-scanner:latest || true
 
