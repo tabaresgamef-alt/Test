@@ -12,21 +12,27 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # 1️⃣ Clonar el repositorio
       - name: Checkout repo
         uses: actions/checkout@v2
 
+      # 2️⃣ Levantar la aplicación PetStore
       - name: Build and Run PetStore
         run: |
           docker pull swaggerapi/petstore
           docker run -d --name petstore -p 8080:8080 swaggerapi/petstore
 
+      # 3️⃣ Ejecutar el escaneo Tenable WAS
       - name: Run Tenable WAS Scan
         run: |
+          # Crear directorio para resultados con timestamp
           TIMESTAMP=$(date +%Y%m%d-%H%M%S)
           REPORT_DIR="scanner_results_$TIMESTAMP"
           mkdir -p "$REPORT_DIR"
 
           docker pull tenable/was-scanner:latest
+
+          # Ejecutar contenedor de Tenable WAS
           docker run \
             -v "$(pwd):/scanner" \
             -t \
@@ -45,6 +51,7 @@ jobs:
           ACCESS_KEY: ${{ secrets.ACCESS_KEY }}
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
 
+      # 4️⃣ Subir resultados como artifact
       - name: Upload Tenable WAS report as artifact
         uses: actions/upload-artifact@v4
         with:
