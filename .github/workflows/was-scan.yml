@@ -29,6 +29,7 @@ jobs:
             -e WAS_MODE=cicd \
             -e ACCESS_KEY=${ACCESS_KEY} \
             -e SECRET_KEY=${SECRET_KEY} \
+            -e CONFIG_FILE=/scanner/tenable_was.conf \
             -e WAS_URL=http://petstore:8080 \
             tenable/was-scanner:latest || true
 
